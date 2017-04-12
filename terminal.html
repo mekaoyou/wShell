@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>web terminal</title>
+  <style type="text/css">
+    /* 全局重置 */
+    html,body,div,ul,p,h3,input{margin: 0;padding: 0;}
+    ul{list-style: none;}
+
+    /* 业务样式 */
+    body{background: #000;font-size: 14px;color: green;line-height: 24px;}
+    .history-result{color: red;}
+    #cmd-input{width: 100%;height: 24px;line-height: 24px;}
+    .cmd-input__title{font-weight: normal;float: left;}
+    .cmd-input__input{margin-left: 5px;}
+  </style>
+</head>
+<body>
+<!-- 入场欢迎 -->
+<div id="welcome">
+  <p>Well come to Web Shell site! </p>
+  <p>Powered by Alex </p>
+  <p>2017-2-23</p>
+  <p>------------------------------------------------</p>
+</div>
+
+<!-- 历史消息 -->
+<div id="history">
+  <ul id="history-list"></ul>
+</div>
+
+<!-- 指令输入 -->
+<div id="cmd-input">
+  <h3 class="cmd-input__title">Web Shell~$</h3>
+  <input type="input" class="cmd-input__input" />
+</div>
+<script src="js/jquery.min.js"></script>
+<script src="js/dateUtils.js"></script>
+<script>
+!(function() {
+  /*
+  * 指令集
+  */
+  var sysCmd = {
+    help: function() {
+      return 'help clear date';
+    },
+
+    clear: function() {
+      $('#history-list').html('');
+    },
+
+    date: function() {
+      return new Date().toUTCString();
+    }
+  }
+
+  /*
+  * 窗口业务流程
+  */
+  var terminal = {
+    /*
+    * 业务初始化
+    */
+    init: function() {
+      this.onSend();
+    },
+
+    /*
+    * 监听回车发送
+    */
+    onSend: function() {
+      var self = this;
+
+      $(document).on('keyup', '.cmd-input__input', function(e) {
+        var cmd = this.value;
+
+        if ( e.keyCode == 13 ) {
+          self.sendCmd(cmd);
+          this.value = '';
+        }
+      })
+    },
+
+    /*
+    * 发送指令
+    * @param {String|Int} cmd 指令
+    */
+    sendCmd: function(cmd) {
+      var msg = 'No such command!';
+
+      sysCmd[cmd] &&  (msg = sysCmd[cmd]());
+      this.print(cmd, msg);
+    },
+
+    /*
+    * 打印指令结果到历史集
+    * @param {String|Int} cmd 指令
+    */
+    print(cmd, result){
+      var history_cmd, history_result = '';
+
+      history_cmd = '<p class="history-cmd">Web Shell~$ '+ cmd +'</p>';
+      if ( result ) history_result = '<p class="history-result">'+ result +'</p>'
+
+      var history = '<li>' + history_cmd + history_result + '</li>';
+
+      $('#history-list').append(history);
+    }
+  }
+
+  // 初始化
+  terminal.init();
+})();  
+</script>
+</body>
+</html>
